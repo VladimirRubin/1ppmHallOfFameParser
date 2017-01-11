@@ -64,11 +64,10 @@ function convertMDtoJSON(mdContent){
         var projectDescription = projectsMatch[PROJECT_DESCRIPTION_GROUP].trim();
         var projectStatus = projectsMatch[PROJECT_STATUS_GROUP] ? projectsMatch[PROJECT_STATUS_GROUP].trim() : '';
         project = {
-            [projectDate]: {
-                name: projectName,
-                description: projectDescription,
-                status: projectStatus
-            }
+            date: projectDate,
+            name: projectName,
+            description: projectDescription,
+            status: projectStatus
         }
         userData.projects.push(project);
     }
