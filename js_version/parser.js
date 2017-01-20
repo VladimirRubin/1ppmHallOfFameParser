@@ -1,4 +1,5 @@
 var https = require('https');
+var fs = require('fs');
 
 var url = 'https://raw.githubusercontent.com/1ppm/1ppmLog/master/HallOfFame.md';
 
@@ -20,7 +21,7 @@ var request = https.get(url, function(res) {
     }).on('end', function() {
         content = Buffer.concat(body).toString();
         var result = convertMDtoJSON(content);
-        console.log(JSON.stringify(result, null, 4));
+        fs.writeFile("HallOfFame.json", JSON.stringify(result, null, 4));
     });
 });
 
@@ -31,12 +32,12 @@ function convertMDtoJSON(mdContent){
     if (usersMatch.index === baseRegex.lastIndex) {
         baseRegex.lastIndex++;
     }
-    
+
     var userData = {
         username: usersMatch[USERNAME_GROUP],
         githubUrl: '',
         otherUrl: '',
-        projects: [] 
+        projects: []
     };
 
     userUrl = usersMatch[USER_URL_GROUP];
@@ -45,7 +46,7 @@ function convertMDtoJSON(mdContent){
     } else {
         userData['otherUrl'] = userUrl;
     }
-    
+
     var projectsMD = usersMatch[PROJECTS_GROUP];
     var projectsMatch;
     while ((projectsMatch = projectsRegex.exec(projectsMD)) !== null) {
@@ -57,8 +58,12 @@ function convertMDtoJSON(mdContent){
         // Name processing
         var projectName = projectsMatch[PROJECT_NAME_GROUP].trim();
         var nameParts = projectName.split(']');
+        var projectUrl = "";
         if (nameParts.length) {
             projectName = nameParts[0].replace('[','');
+        }
+        if (nameParts.length > 1 ) {
+          projectUrl = nameParts[1].replace('(','').replace(')','');
         }
         // Description processing
         var projectDescription = projectsMatch[PROJECT_DESCRIPTION_GROUP].trim();
@@ -66,6 +71,7 @@ function convertMDtoJSON(mdContent){
         project = {
             date: projectDate,
             name: projectName,
+            url: projectUrl,
             description: projectDescription,
             status: projectStatus
         }
