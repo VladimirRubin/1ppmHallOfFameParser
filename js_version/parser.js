@@ -2,9 +2,10 @@ var https = require('https');
 
 var url = 'https://raw.githubusercontent.com/1ppm/1ppmLog/master/HallOfFame.md';
 
-var baseRegex = /\#{1,2}\s\[([^\]]+)\]\(([^)]+)\)(\n{1,}(\|.+\|))+/g;
+var baseRegex = /\#{1,2}\s\[([^\]]+)\]\(([^)]+)\)(\s\(.*(\@[^\)\]]+).*\))?(\n{1,}(\|.+\|))+/g;
 var USERNAME_GROUP = 1;
 var USER_URL_GROUP = 2;
+var USER_TWITTER_GROUP = 4;
 var PROJECTS_GROUP = 0;
 
 var projectsRegex = /^\|([0-9\s\/]+)\|(.+?)\|(.+?)\|((.+)\|)?/gm;
@@ -35,11 +36,12 @@ function convertMDtoJSON(mdContent){
     var userData = {
         username: usersMatch[USERNAME_GROUP],
         githubUrl: '',
+        twitterName: usersMatch[USER_TWITTER_GROUP] || '',
         otherUrl: '',
         projects: [] 
     };
 
-    userUrl = usersMatch[USER_URL_GROUP];
+    var userUrl = usersMatch[USER_URL_GROUP];
     if (userUrl.indexOf('github') > -1) {
         userData['githubUrl'] = userUrl;
     } else {
